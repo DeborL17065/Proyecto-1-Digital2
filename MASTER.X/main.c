@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include "LCD.h"
 #include "I2C.h"
+#include "MLX90614.h"
 
 void init(void);
 
@@ -47,12 +48,17 @@ void main(void) {
     
     while(1){
         
-        I2C_Master_Start();
-        I2C_Master_Write(0x51);
-        S_TEMPERATURA = I2C_Master_Read(0);
-//        I2C_Master_Write(0x0F);
-        I2C_Master_Stop();
+        Temp = Leer_Sensor(_AMB_TEMP);         // Lee Temp. ambiente
+        Temp = (Temp * 0.02) - 273.15;         // Convierte a grados Celsius
         __delay_ms(200);
+       
+        
+//        I2C_Master_Start();
+//        I2C_Master_Write(0x51);
+//        S_TEMPERATURA = I2C_Master_Read(0);
+////        I2C_Master_Write(0x0F);
+//        I2C_Master_Stop();
+//        __delay_ms(200);
         
         //I2C_Master_Start();
         I2C_Master_RepeatedStart();
@@ -83,8 +89,9 @@ void main(void) {
         Lcd_Clear();
         LCD_XY(0,2);
         LCD_Cadena("S1:  S2:  S3:"); 
-        LCD_XY(1,2);
-        LCD_Cadena(ST);//manda el dato a la LCD
+        Mostrar_Temperatura(_AMB_TEMP, Temp);  // Muestra los datos 
+//        LCD_XY(1,2);
+//        LCD_Cadena(ST);//manda el dato a la LCD
         LCD_XY(1,7);
         LCD_Cadena(SH);//manda el dato a la LCD
         LCD_XY(1,12);
