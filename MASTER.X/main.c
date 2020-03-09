@@ -36,45 +36,39 @@
 #include "I2C.h"
 #include "MLX90614.h"
 
+
+
 void init(void);
+void read(float LUZ);
+void read1(int m);
 
-
-uint8_t S_TEMPERATURA, S_HUMEDAD,S_NIVEL;
-char ST[5],SH[5],SN[5];
+int a;
+uint8_t S_NIVEL;
+float S_HUMEDAD;
+char SH[5],SN[5];
 
 void main(void) {
     init();
     LCD_INIT();
-    
-    while(1){
-        
+    T1CON = 0x10;               //Initialize Timer Module
+    while(1){    
         Temp = Leer_Sensor(_AMB_TEMP);         // Lee Temp. ambiente
         Temp = (Temp * 0.02) - 273.15;         // Convierte a grados Celsius
         __delay_ms(200);
-       
         
-//        I2C_Master_Start();
-//        I2C_Master_Write(0x51);
-//        S_TEMPERATURA = I2C_Master_Read(0);
-////        I2C_Master_Write(0x0F);
-//        I2C_Master_Stop();
-//        __delay_ms(200);
-        
-        //I2C_Master_Start();
         I2C_Master_RepeatedStart();
         I2C_Master_Write(0x61);
         S_HUMEDAD = I2C_Master_Read(0);
-//        I2C_Master_Write(0x0F);
         I2C_Master_Stop();
         __delay_ms(200);
-        
-         //I2C_Master_Start();
-        I2C_Master_RepeatedStart();
-        I2C_Master_Write(0x41);
-        S_NIVEL = I2C_Master_Read(0);
-//        I2C_Master_Write(0x0F);
-        I2C_Master_Stop();
-        __delay_ms(200);
+//        
+//         //I2C_Master_Start();
+//        I2C_Master_RepeatedStart();
+//        I2C_Master_Write(0x41);
+//        S_NIVEL = I2C_Master_Read(0);
+////        I2C_Master_Write(0x0F);
+//        I2C_Master_Stop();
+//        __delay_ms(200);
 //       
 //        I2C_Master_Start();
 //        I2C_Master_Write(0x51);
@@ -82,20 +76,33 @@ void main(void) {
 //        I2C_Master_Stop();
 //        __delay_ms(200);
 //        PORTB++; 
-        
-        itoa(ST,S_TEMPERATURA,10);
-        itoa(SH,S_HUMEDAD,10);
-        itoa(SN,S_NIVEL,10);
+        TMR1H = 0;                //Sets the Initial Value of Timer
+        TMR1L = 0;                //Sets the Initial Value of Timer
+
+        RB0 = 1;                  //TRIGGER HIGH
+        __delay_us(10);           //10uS Delay 
+        RB0 = 0;                  //TRIGGER LOW
+
+        while(!RB4);              //Waiting for Echo
+        TMR1ON = 1;               //Timer Starts
+        while(RB4);               //Waiting for Echo goes LOW
+        TMR1ON = 0;               //Timer Stops
+
+        a = (TMR1L | (TMR1H<<8)); //Reads Timer Value
+        a = a/58;              //Converts Time to Distance
+       
+    
         Lcd_Clear();
         LCD_XY(0,2);
         LCD_Cadena("S1:  S2:  S3:"); 
         Mostrar_Temperatura(_AMB_TEMP, Temp);  // Muestra los datos 
-//        LCD_XY(1,2);
-//        LCD_Cadena(ST);//manda el dato a la LCD
-        LCD_XY(1,7);
-        LCD_Cadena(SH);//manda el dato a la LCD
-        LCD_XY(1,12);
-        LCD_Cadena(SN);//manda el dato a la LCD
+        S_HUMEDAD = (S_HUMEDAD/255)*100;
+        read(S_HUMEDAD);
+        read1(a);
+
+        
+  //      LCD_XY(1,12);
+   //     LCD_Cadena(SN);//manda el dato a la LCD
 //
 //    
     }
@@ -109,6 +116,7 @@ void init(void) {
     OSCCONbits.IRCF2 = 1; 
     ///////////////////////////////////////////////////////////
     TRISD =0b00000000; //se define el puerto D como salidas
+    TRISB =0b00010000;     
     //////////////////////////////////////////////////////////////
     PORTC =0;           //se limpia el puerto C
     PORTD =0;          //se limpia el puerto D
@@ -121,4 +129,30 @@ void init(void) {
     INTCONbits.GIE = 1;
     INTCONbits.PEIE = 1;
     I2C_Master_Init(100000);        // Inicializar Comuncación I2C
+}
+
+void read(float LUZ){
+    char SA[5],SB[5],SC[5],PUNTO1[5];
+    int A_,B_,C_,NUM1_;
+    NUM1_ =(LUZ)*10;
+    A_ = NUM1_%10;   //8
+    itoa(SA,A_,10);
+    B_ = (NUM1_/10)%10;//9
+    itoa(SB,B_,10);
+    C_ = (NUM1_/100)%10;//1 
+    itoa(SC,C_,10);
+    strcpy(PUNTO1,"."); //se coloca el caracter dentro del char
+    strcat(PUNTO1,SA); //se concatenan ambos chars
+    strcat(SB,PUNTO1); //se concatenan ambos chars
+    strcat(SC,SB);
+    LCD_XY(1,7);
+    LCD_Cadena(SC);//manda el dato a la LCD
+}
+
+void read1(int m){
+    char SC[5];
+    sprintf(SC,"%3u",m);
+    LCD_XY(1,12);   
+    LCD_Cadena(SC);//manda el dato a la LCD
+
 }
