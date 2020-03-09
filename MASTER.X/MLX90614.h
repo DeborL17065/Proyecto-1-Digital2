@@ -12,7 +12,7 @@
 int _IR_THERMO_ADDR = 0x5A;
 int _AMB_TEMP      = 0x06;
 int _OBJ_TEMP      = 0x07;
- 
+int A,B,C,NUM1;
 float Temp;
 
 float Leer_Sensor(char Temp_Source);
