@@ -45,7 +45,6 @@ float Leer_Sensor(char Temp_Source){
 void Mostrar_Temperatura(char Temp_Source, float temperatura){
     
     char text[5],SA[5],SB[5],SC[5],PUNTO1[5];
-  //sprintf(text,"%2.1f", temperatura);
  
     if (Temp_Source == _AMB_TEMP){
         LCD_XY(1,2);
