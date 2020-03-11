@@ -35,7 +35,11 @@
 #include "LCD.h"
 #include "I2C.h"
 #include "MLX90614.h"
+#include "USART.h"
 
+#define SWITCH  RB1
+#define ALARMA  RB2
+#define ALUMBRADO  RB3
 
 
 void init(void);
@@ -43,9 +47,8 @@ void read(float LUZ);
 void read1(int m);
 
 int a;
-uint8_t S_NIVEL;
-float S_HUMEDAD;
-char SH[5],SN[5];
+float S_Luz;
+
 
 void main(void) {
     init();
@@ -58,9 +61,10 @@ void main(void) {
         
         I2C_Master_RepeatedStart();
         I2C_Master_Write(0x61);
-        S_HUMEDAD = I2C_Master_Read(0);
+        S_Luz = I2C_Master_Read(0);
         I2C_Master_Stop();
         __delay_ms(200);
+        
 //        
 //         //I2C_Master_Start();
 //        I2C_Master_RepeatedStart();
@@ -76,6 +80,9 @@ void main(void) {
 //        I2C_Master_Stop();
 //        __delay_ms(200);
 //        PORTB++; 
+
+    //////////////////SENSOR ULTRASONICO/////////////////////////
+
         TMR1H = 0;                //Sets the Initial Value of Timer
         TMR1L = 0;                //Sets the Initial Value of Timer
 
@@ -83,22 +90,46 @@ void main(void) {
         __delay_us(10);           //10uS Delay 
         RB0 = 0;                  //TRIGGER LOW
 
-        while(!RB4);              //Waiting for Echo
+         while(!RB4);              //Waiting for Echo
         TMR1ON = 1;               //Timer Starts
         while(RB4);               //Waiting for Echo goes LOW
         TMR1ON = 0;               //Timer Stops
 
         a = (TMR1L | (TMR1H<<8)); //Reads Timer Value
         a = a/58;              //Converts Time to Distance
-       
+    ///////////////////////////////////////////////////////////////   
     
+
+    ////////////////  DESPLIEGUE EN LCD  //////////////////////////
+
         Lcd_Clear();
         LCD_XY(0,2);
         LCD_Cadena("S1:  S2:  S3:"); 
         Mostrar_Temperatura(_AMB_TEMP, Temp);  // Muestra los datos 
-        S_HUMEDAD = (S_HUMEDAD/255)*100;
-        read(S_HUMEDAD);
+        S_Luz = (S_Luz/255)*100;
+        read(S_Luz);
         read1(a);
+    ////////////////////////////////////////////////////////////////
+        
+        if (Temp>20){
+            SWITCH =1;
+        }
+        else{
+            SWITCH =0;
+        }
+        
+        if (a<12){
+            ALARMA =1;
+        }
+        else{
+            ALARMA =0;
+        }
+        if (S_Luz<75){
+            ALUMBRADO =1;
+        }
+        else{
+            ALUMBRADO =0;
+        }
 
         
   //      LCD_XY(1,12);
@@ -116,7 +147,7 @@ void init(void) {
     OSCCONbits.IRCF2 = 1; 
     ///////////////////////////////////////////////////////////
     TRISD =0b00000000; //se define el puerto D como salidas
-    TRISB =0b00010000;     
+    TRISB =0b00011110;     
     //////////////////////////////////////////////////////////////
     PORTC =0;           //se limpia el puerto C
     PORTD =0;          //se limpia el puerto D
