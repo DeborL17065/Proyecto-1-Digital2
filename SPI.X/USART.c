@@ -34,11 +34,19 @@ void _RX_TX (void){
     SPBRGH =0;   
 }
 
+uint8_t SERIALREAD(){
+    while(!PIR1bits.RCIF);
+    return RCREG;
+   // }
+}
+
 
 void SerialSendChar (char CARACTER) {
+    while(!TXSTAbits.TRMT);
     TXREG = CARACTER; //EL REGISTRO DE TX SE CARGA CON "CARACTER"
-    while(!TXSTAbits.TRMT); 
-    return;
+    
+     
+  //  return;
 }
 
 void SerialSendString(char *txbuffer){
