@@ -12,8 +12,6 @@ spi = spidev.SpiDev()
 spi.open(0,0)
 spi.mode = 3
 spi.max_speed_hz = 125000
-TE = 0
-L = 0
 try:
     while True :
         
@@ -85,62 +83,12 @@ try:
             aio.send_data(lluvia.key,N)
             nivel = aio.feeds('nivel-del-tanque-de-agua')
             aio.send_data(nivel.key,TE)
-#             spi = spidev.SpiDev()
-#             spi.open(0,0)
-#             spi.mode = 3
-#             spi.max_speed_hz = 125000
-#             ALARMA = spi.xfer([0x55])
-#             A = int("".join(map(str, ALARMA)))
-#             spi.close()
-            
 
-         
-         
-
-         #   print(A)
-            
-           
-            
-        
-           # i=0
         
         
-        
-            
            
 
- 
-            
-            
-#         
-#         
-#         HUMEDAD = spi.xfer([0x52])
-#         H = int("".join(map(str, HUMEDAD)))
-#         H = (H/255)*100
-
-#         print(H)
-#         
-#         LLUVIA = spi.xfer([0x53])
-#         LL = int("".join(map(str, LLUVIA)))
-#         LL = (LL/255)*100
-
-#         print(LL)
-#         
-#         NIVEL = spi.xfer([0x54])
-#         N = int("".join(map(str, NIVEL)))
-#         N = (N/255)*100
-#         nivel = aio.feeds('nivel-del-tanque-de-agua')
-#         aio.send_data(nivel.key,N)
-#         print(N)
-#         
-#         ALARMA = spi.xfer([0x55])
-#         A = int("".join(map(str, ALARMA)))
-#         alarma = aio.feeds('alarma')
-#         aio.send_data(alarma.key,A)
-#         print(A)
-        
-
-#         
+     
         
       
         
