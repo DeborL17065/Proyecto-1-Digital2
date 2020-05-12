@@ -12,6 +12,7 @@
 void _RX_TX (void);
 void SerialSendChar (char CARACTER);
 void SerialSendString(char *txbuffer);
+uint8_t SERIALREAD();
 
 #endif	/* USART_H */
 
