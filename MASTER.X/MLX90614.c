@@ -23,21 +23,38 @@
 * 0x07 Para la temperatura del objeto
 * Retorna el valor de temperatura en grados Kelvin.
 *****************************************************************************/
-float Leer_Sensor(char Temp_Source){
-    
-    unsigned int Temp_var;
+float Leer_Sensor(){
     
     I2C_Master_Start();
     I2C_Master_Write(_IR_THERMO_ADDR << 1);
-    I2C_Master_Write(Temp_Source);
+    I2C_Master_Write(_AMB_TEMP);
     I2C_Master_RepeatedStart();
     I2C_Master_Write(_IR_THERMO_ADDR << 1);
-    Temp_var = I2C_Master_Read(0);
-    Temp_var = (I2C_Master_Read(0) << 8) + Temp_var;
+//    Temp_var = I2C_Master_Read(0);
+//    Temp_var = (I2C_Master_Read(0) << 8) + Temp_var1;
+    Temp_var1 = I2C_Master_Read(0);
+    Temp_var2 = I2C_Master_Read(0);
+    Temp_var = (Temp_var2 << 8) + Temp_var1;
     I2C_Master_Stop();                  
- 
-  return Temp_var;
+      
 }
+//float Leer_Sensor(char Temp_Source){
+//    
+//    I2C_Master_Start();
+//    I2C_Master_Write(_IR_THERMO_ADDR << 1);
+//    I2C_Master_Write(Temp_Source);
+//    I2C_Master_RepeatedStart();
+//    I2C_Master_Write(_IR_THERMO_ADDR << 1);
+////    Temp_var = I2C_Master_Read(0);
+////    Temp_var = (I2C_Master_Read(0) << 8) + Temp_var1;
+//    Temp_var1 = I2C_Master_Read(0);
+//    Temp_var2 = I2C_Master_Read(0);
+//    Temp_var = (Temp_var2 << 8) + Temp_var1;
+//    I2C_Master_Stop();                  
+//    
+//    return; 
+//    
+//}
 
 /*****************************************************************************
 * Muestra los valores de temperatura tanto del objeto como el ambiente.
@@ -47,7 +64,7 @@ void Mostrar_Temperatura(char Temp_Source, float temperatura){
     char text[5],SA[5],SB[5],SC[5],PUNTO1[5];
  
     if (Temp_Source == _AMB_TEMP){
-        LCD_XY(1,2);
+        LCD_XY(1,0);
         NUM1 = (temperatura)*10;
         A = NUM1%10;   //8
         itoa(SA,A,10);
