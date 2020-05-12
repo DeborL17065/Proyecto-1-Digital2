@@ -14,8 +14,9 @@ int _AMB_TEMP      = 0x06;
 int _OBJ_TEMP      = 0x07;
 int A,B,C,NUM1;
 float Temp;
-
-float Leer_Sensor(char Temp_Source);
+unsigned int Temp_var;
+uint8_t Temp_var1,Temp_var2;
+float Leer_Sensor();
 void Mostrar_Temperatura(char Temp_Source, float temperatura);
 #endif	/* MLX90614_H */
 
